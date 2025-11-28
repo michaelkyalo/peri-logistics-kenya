@@ -1,0 +1,415 @@
+/* Overlay container to hold all dashboard content */
+.dashboard-overlay {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  z-index: 1; /* Ensure above background image */
+  width: 100%;
+}
+
+/* Top cards (Order Truck & View Requests) */
+.dashboard-top-cards {
+  display: flex;
+  flex-direction: column; /* stacked vertically */
+  gap: 1rem;
+  width: 80%;
+  max-width: 600px;
+  margin-bottom: 2rem;
+}
+
+.card-button {
+  background-color: white;
+  color: black;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.card-button h3 {
+  margin-bottom: 0.5rem;
+}
+
+.card-button p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Panels stacked vertically below top cards */
+.dashboard-panels-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 80%;
+  max-width: 600px;
+  margin-bottom: 2rem;
+}
+
+/* Each panel (Delivery Tracker / Notifications) */
+.tracker-section,
+.notifications-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Panel header clickable */
+.tracker-section h2,
+.notifications-section h2 {
+  cursor: pointer;
+  margin: 0;
+  padding: 0.5rem 0;
+  color: #000; /* black text */
+}
+
+/* Cards inside panels */
+.service-card {
+  background-color: white; /* white card */
+  color: black; /* black text */
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+/* Logout section */
+.logout-section {
+  margin-top: 2rem;
+}
+
+.logout-link {
+  color: white;
+  text-decoration: underline;
+  font-size: 1.2rem;
+}
+/* Ensure the overlay container is above the background */
+.dashboard-overlay {
+  position: relative; /* relative positioning keeps it above the background */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  z-index: 2; /* higher than the background image */
+  width: 100%;
+}
+
+/* Top cards floating over the image */
+.dashboard-top-cards {
+  display: flex;
+  flex-direction: column; /* vertical stack */
+  gap: 1rem;
+  width: 80%;
+  max-width: 600px;
+  margin-top: 3rem; /* add spacing from top of image */
+  margin-bottom: 2rem;
+}
+
+/* Top card buttons */
+.card-button {
+  background-color: white;
+  color: black;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 2; /* ensure on top */
+  position: relative; /* needed for z-index to work */
+}
+/* Fullscreen Background */
+.fullscreen-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+}
+
+/* Overlay container */
+.dashboard-overlay {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  z-index: 2;
+  width: 100%;
+}
+
+/* Top cards */
+.dashboard-top-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 80%;
+  max-width: 600px;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+}
+
+.card-button {
+  background-color: white;
+  color: black;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.card-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.card-button h3 {
+  margin-bottom: 0.5rem;
+}
+
+.card-button p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+/* Overlay container for cards */
+.dashboard-overlay {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  z-index: 2;
+  width: 100%;
+}
+
+/* Top cards (all 4 cards) */
+.dashboard-top-cards {
+  display: flex;
+  flex-direction: column; /* vertically stacked */
+  gap: 1rem;
+  width: 80%;
+  max-width: 600px;
+  margin-top: 3rem;
+}
+
+/* Individual cards */
+.card-button {
+  background-color: white;
+  color: black;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.card-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.card-button h3 {
+  margin-bottom: 0.5rem;
+}
+
+.card-button p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Fullscreen background */
+.fullscreen-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+}
+
+/* Logout */
+.logout-section {
+  margin-top: 2rem;
+}
+
+.logout-link {
+  color: white;
+  text-decoration: underline;
+  font-size: 1.2rem;
+}
+.subscription-container {
+  padding: 40px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.subscription-container h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.subscription-container p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.plan-cards {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.plan-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px;
+  width: 250px;
+  transition: transform 0.2s ease;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+}
+
+.plan-card h3 {
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.plan-card ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.plan-card li {
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.subscribe-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #3498db;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.subscribe-button:hover {
+  background-color: #2980b9;
+}
+
+/* Different plan colors */
+.plan-card.basic {
+  border-top: 4px solid #95a5a6;
+}
+
+.plan-card.premium {
+  border-top: 4px solid #f1c40f;
+}
+
+.plan-card.farmfresh {
+  border-top: 4px solid #2ecc71;
+}
+.notification-container {
+  width: 350px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.notification-container h2 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  color: #2c3e50;
+}
+
+.no-notifications {
+  text-align: center;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-item {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  border-left: 4px solid #3498db; /* default type color */
+}
+
+.notification-item.success {
+  border-left-color: #2ecc71;
+}
+
+.notification-item.error {
+  border-left-color: #e74c3c;
+}
+
+.notification-item.info {
+  border-left-color: #3498db;
+}
+
+.message {
+  margin: 0;
+  font-size: 1rem;
+  color: #2c3e50;
+}
+
+.time {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+
+
+
+

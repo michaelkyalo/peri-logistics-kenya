@@ -11,7 +11,7 @@ function Dashboard() {
 
       {/* Overlay container */}
       <div className="dashboard-overlay">
-        {/* Top cards (all 4 as cards) */}
+        {/* Top cards */}
         <div className="dashboard-top-cards">
           <Link to="/create-request" className="card-button">
             <h3>Order Truck</h3>
@@ -31,6 +31,12 @@ function Dashboard() {
           <Link to="/notifications" className="card-button">
             <h3>Notifications</h3>
             <p>View alerts and updates from couriers</p>
+          </Link>
+
+          {/* New Packaging Card */}
+          <Link to="/packaging" className="card-button">
+            <h3>Packaging</h3>
+            <p>Book after-sale packaging services for your goods</p>
           </Link>
         </div>
 

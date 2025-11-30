@@ -408,7 +408,52 @@
   font-size: 0.8rem;
   color: #999;
 }
+/* Dashboard Cards */
+.dashboard-top-cards {
+  display: flex;
+  flex-direction: column; /* Stack cards vertically */
+  gap: 20px; /* Space between cards */
+}
 
+/* Individual Card Buttons */
+.card-button {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.card-button:hover {
+  transform: translateY(-3px);
+}
+
+/* After-sale Packaging Card */
+.after-sale-card {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 10px;
+}
+
+/* Fullscreen background */
+.fullscreen-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+/* Overlay */
+.dashboard-overlay {
+  padding: 40px;
+}
 
 
 

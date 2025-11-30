@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 // Pages
 import Home from "./pages/ Home";
+
 import Dashboard from "./pages/Dashboard";
 import CourierDashboard from "./pages/CourierDashboard";
 import CreateRequest from "./pages/CreateRequest";
@@ -10,6 +11,7 @@ import ViewRequests from "./pages/ViewRequests";
 import ManageTrucks from "./pages/ManageTrucks";
 import SubscriptionPlan from "./pages/SubscriptionPlan";
 import Notification from "./pages/Notification";
+import Package from "./pages/Packaging";
 
 // Context
 import { RequestProvider } from "./context/RequestContext";
@@ -32,6 +34,9 @@ function App() {
           {/* Subscription & Notifications */}
           <Route path="/subscription-plan" element={<SubscriptionPlan />} />
           <Route path="/notifications" element={<Notification />} />
+
+          {/* After-Sale Packaging Service */}
+          <Route path="/packaging" element={<Package />} />
         </Routes>
       </Router>
     </RequestProvider>

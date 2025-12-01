@@ -1,10 +1,28 @@
-import React, { useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { RequestContext } from "../context/RequestContext";
+import { api } from "../api";
 
 function ViewRequests() {
-  const { requests } = useContext(RequestContext);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Fetch requests from backend
+  const fetchRequests = async () => {
+    try {
+      const response = await api.get("/requests/");
+      setRequests(response.data);
+    } catch (error) {
+      console.error("Failed to fetch requests:", error);
+      alert("Failed to fetch requests. Make sure you are logged in.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
 
   return (
     <div className="dashboard-container">
@@ -12,7 +30,7 @@ function ViewRequests() {
       <button
         onClick={() => navigate(-1)}
         style={{
-          backgroundColor: "#007BFF", // Blue color
+          backgroundColor: "#007BFF",
           color: "white",
           border: "none",
           padding: "8px 12px",
@@ -27,7 +45,9 @@ function ViewRequests() {
 
       <h2>My Truck Requests & Delivery Tracker</h2>
 
-      {requests.length === 0 ? (
+      {loading ? (
+        <p>Loading requests...</p>
+      ) : requests.length === 0 ? (
         <p>No requests made yet.</p>
       ) : (
         <div className="requests-list">
@@ -37,14 +57,28 @@ function ViewRequests() {
               className="service-card"
               style={{ marginBottom: "1rem" }}
             >
-              <h3>{req.truck}</h3>
-              <p><strong>Courier:</strong> {req.courier}</p>
-              <p><strong>Pickup:</strong> {req.region}</p>
-              <p><strong>Capacity:</strong> {req.capacity.toLocaleString()} KGs</p>
-              <p><strong>Status:</strong> {req.status}</p>
-              <p><strong>Location:</strong> {req.currentLocation}</p>
-              <p><strong>Destination:</strong> {req.destination}</p>
-              <p><strong>Price:</strong> KES {req.price.toLocaleString()}</p>
+              <h3>{req.truck} Truck</h3>
+              <p>
+                <strong>Courier:</strong> {req.courier || "N/A"}
+              </p>
+              <p>
+                <strong>Pickup:</strong> {req.pickup_location || req.region || "N/A"}
+              </p>
+              <p>
+                <strong>Capacity:</strong> {req.capacity?.toLocaleString() || "N/A"} KGs
+              </p>
+              <p>
+                <strong>Status:</strong> {req.status || "Pending"}
+              </p>
+              <p>
+                <strong>Location:</strong> {req.currentLocation || "Depot"}
+              </p>
+              <p>
+                <strong>Destination:</strong> {req.dropoff_location || "Nairobi Town"}
+              </p>
+              <p>
+                <strong>Price:</strong> KES {req.price?.toLocaleString() || "N/A"}
+              </p>
             </div>
           ))}
         </div>

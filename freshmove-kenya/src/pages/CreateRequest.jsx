@@ -1,7 +1,7 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { RequestContext } from "../context/RequestContext";
 import "../index.css";
+import { api } from "../api";
 
 const trucks = [
   { size: "Small", capacity: 4000, basePrice: 3000 },
@@ -31,7 +31,6 @@ function CreateRequest() {
   const [selectedTruck, setSelectedTruck] = useState(null);
   const [estimatedPrice, setEstimatedPrice] = useState(null);
 
-  const { addRequest } = useContext(RequestContext);
   const navigate = useNavigate();
 
   const handleSelectCourier = (courier) => {
@@ -53,26 +52,33 @@ function CreateRequest() {
     setEstimatedPrice(price);
   };
 
-  const handleSubmitOrder = () => {
-    const newOrder = {
-      id: Date.now(),
+  const handleSubmitOrder = async () => {
+    if (!selectedCourier || !selectedRegion || !selectedTruck) return;
+
+    const payload = {
       courier: selectedCourier.name,
       region: selectedRegion.name,
-      truck: `${selectedTruck.size} Cargo Truck`,
+      truck: selectedTruck.size,
       capacity: selectedTruck.capacity,
-      status: "Pending",
-      currentLocation: selectedRegion.name + " Depot",
-      destination: "Nairobi Town",
-      price: estimatedPrice,
+      weight_kg: selectedTruck.capacity,
+      pickup_location: selectedRegion.name + " Depot",
+      dropoff_location: "Nairobi Town",
+      status: "pending",
     };
 
-    addRequest(newOrder);
-    navigate("/view-requests");
+    try {
+      await api.post("/requests/", payload);
+      alert("Order submitted successfully!");
+      navigate("/view-requests");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit order.");
+    }
   };
 
   return (
     <div className="dashboard-container">
-      {/* Global Go Back Button */}
+      {/* Go Back Button */}
       <button 
         className="go-back-button" 
         onClick={() => navigate(-1)}

@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/ Home";
 
 import Dashboard from "./pages/Dashboard";
-import CourierDashboard from "./pages/CourierDashboard";
 import CreateRequest from "./pages/CreateRequest";
 import ViewRequests from "./pages/ViewRequests";
 import ManageTrucks from "./pages/ManageTrucks";
@@ -24,7 +23,6 @@ function App() {
           {/* Main Pages */}
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/courier-dashboard" element={<CourierDashboard />} />
 
           {/* Truck Requests */}
           <Route path="/create-request" element={<CreateRequest />} />

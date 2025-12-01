@@ -1,22 +1,50 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import truckImage from "../assets/fresh.jpg";
+import { api } from "../api"; // use your axios instance
 
 function Home() {
-  const [name, setName] = useState("");
-  const [idNumber, setIdNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // for redirecting
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (!name.trim() || idNumber.trim().length < 5 || !password.trim()) {
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
       alert("Please fill in all fields correctly");
       return;
     }
 
-    alert(`Logged in as ${name} with ID: ${idNumber}`);
-    navigate("/dashboard");
+    setLoading(true);
+
+    try {
+      const payload = { email, password };
+
+      const response = await api.post("/auth/login", payload, {
+        withCredentials: true, // send cookies if backend uses them
+      });
+
+      // Save JWT token in localStorage using the same key your interceptor reads
+      if (response.data.access_token) {
+        localStorage.setItem("access_token", response.data.access_token);
+      }
+
+      // Optional: save user email
+      localStorage.setItem("userEmail", email);
+
+      alert(`Logged in successfully as ${email}`);
+
+      // Navigate to dashboard
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert(
+        error.response?.data?.message || "Login failed. Check credentials."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,7 +56,6 @@ function Home() {
         overflow: "hidden",
       }}
     >
-      {/* Background Image */}
       <img
         src={truckImage}
         alt="Truck"
@@ -43,7 +70,6 @@ function Home() {
         }}
       />
 
-      {/* Login Form */}
       <div
         style={{
           position: "absolute",
@@ -64,23 +90,10 @@ function Home() {
         <h2 style={{ marginBottom: "10px" }}>Login</h2>
 
         <input
-          type="text"
-          placeholder="Enter Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{
-            padding: "10px",
-            borderRadius: "5px",
-            border: "1px solid #ccc",
-            fontSize: "16px",
-          }}
-        />
-
-        <input
-          type="text"
-          placeholder="Enter ID Number"
-          value={idNumber}
-          onChange={(e) => setIdNumber(e.target.value)}
+          type="email"
+          placeholder="Enter Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           style={{
             padding: "10px",
             borderRadius: "5px",
@@ -104,6 +117,7 @@ function Home() {
 
         <button
           onClick={handleLogin}
+          disabled={loading}
           style={{
             padding: "10px",
             borderRadius: "5px",
@@ -114,7 +128,7 @@ function Home() {
             cursor: "pointer",
           }}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
       </div>
     </div>

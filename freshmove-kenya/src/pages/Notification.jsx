@@ -1,30 +1,53 @@
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../api";
 
 function Notification() {
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Hardcoded notifications
-  const notifications = [
-    { message: "Your order has been picked up!", time: "2 min ago", type: "success" },
-    { message: "New delivery request available.", time: "10 min ago", type: "info" },
-    { message: "Payment failed for last order.", time: "1 hour ago", type: "error" },
-    { message: "Farmer John uploaded fresh strawberries.", time: "3 hours ago", type: "info" },
-    { message: "Your delivery has been completed successfully.", time: "5 hours ago", type: "success" },
-  ];
+  const fetchNotifications = async () => {
+    try {
+      const response = await api.get("/notifications/");
+      setNotifications(response.data);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+      alert("Failed to load notifications. Make sure you are logged in.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   return (
     <div className="notification-container">
       {/* Go Back Button */}
-      <button 
+      <button
         className="go-back-button"
         onClick={() => navigate(-1)}
+        style={{
+          marginBottom: "1rem",
+          padding: "8px 16px",
+          borderRadius: "6px",
+          border: "none",
+          backgroundColor: "#3498db",
+          color: "#fff",
+          cursor: "pointer",
+        }}
       >
         &larr; Go Back
       </button>
 
       <h2>Notifications</h2>
-      {notifications.length === 0 ? (
+
+      {loading ? (
+        <p>Loading notifications...</p>
+      ) : notifications.length === 0 ? (
         <p className="no-notifications">No new notifications</p>
       ) : (
         <ul className="notification-list">

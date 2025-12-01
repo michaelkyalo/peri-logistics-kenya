@@ -1,6 +1,8 @@
+
 // Package.jsx
 import React, { useState } from "react";
 import "../index.css";
+import { api } from "../api";
 
 function Package() {
   const [form, setForm] = useState({
@@ -10,13 +12,36 @@ function Package() {
     notes: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Packaging request submitted!" + "\n" + JSON.stringify(form, null, 2));
+
+    setLoading(true);
+
+    try {
+      const payload = {
+        item_type: form.itemType,
+        weight_kg: form.weight,
+        packaging_type: form.packagingType,
+        notes: form.notes,
+      };
+
+      await api.post("/packaging/", payload);
+
+      alert("Packaging request submitted successfully!");
+      // Optionally, clear form
+      setForm({ itemType: "", weight: "", packagingType: "", notes: "" });
+    } catch (error) {
+      console.error("Failed to submit packaging request:", error);
+      alert("Failed to submit packaging request. Make sure you are logged in.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,10 +91,13 @@ function Package() {
           placeholder="Any special instructions..."
         ></textarea>
 
-        <button type="submit">Submit Packaging Request</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Submitting..." : "Submit Packaging Request"}
+        </button>
       </form>
     </div>
   );
 }
 
 export default Package;
+

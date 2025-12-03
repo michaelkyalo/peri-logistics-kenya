@@ -19,11 +19,15 @@ def create_app():
     # Ensure instance folder exists
     os.makedirs(app.instance_path, exist_ok=True)
 
-    # Set database path to instance/peri_logistics.db
+    # Load default config
     app.config.from_object(Config)
-    app.config['SQLALCHEMY_DATABASE_URI'] = \
-        f"sqlite:///{os.path.join(app.instance_path, 'peri_logistics.db')}"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # Use DATABASE_URL from environment if available (Supabase Postgres)
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        "DATABASE_URL",
+        f"sqlite:///{os.path.join(app.instance_path, 'peri_logistics.db')}"
+    )
 
     # Initialize extensions
     db.init_app(app)
@@ -32,7 +36,10 @@ def create_app():
     # Configure CORS for your React frontend
     CORS(
         app,
-        origins=["http://localhost:5173"],
+        origins=[
+            "http://localhost:5173",                # local dev
+            "https://your-frontend.vercel.app"     # deployed frontend
+        ],
         supports_credentials=True,
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization"]
@@ -51,7 +58,7 @@ def create_app():
     def home():
         return {"status": "backend running"}, 200
 
-    # Optional: Handle OPTIONS preflight globally
+    # Handle OPTIONS preflight globally
     @app.before_request
     def before_request_func():
         from flask import request
@@ -60,6 +67,8 @@ def create_app():
 
     return app
 
+
 if __name__ == "__main__":
+    # Port 5000 for local testing; Vercel will override
     app = create_app()
     app.run(debug=True, port=5000)

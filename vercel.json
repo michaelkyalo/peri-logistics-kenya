@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "freshmove-kenya/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    },
+    {
+      "src": "Backend/api/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/Backend/api/app.py"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/freshmove-kenya/dist/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/freshmove-kenya/dist/index.html"
+    }
+  ]
+}

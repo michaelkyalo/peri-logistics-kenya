@@ -3,18 +3,20 @@ import { api } from "../api";
 
 function ManageTrucks() {
   const [trucks, setTrucks] = useState([]);
-  const [truckName, setTruckName] = useState("");
+  const [plate, setPlate] = useState("");
   const [capacity, setCapacity] = useState("");
+  const [refrigerated, setRefrigerated] = useState(true);
   const [loading, setLoading] = useState(true);
 
   // Fetch trucks from backend
   const fetchTrucks = async () => {
     try {
       const response = await api.get("/trucks/");
-      setTrucks(response.data);
+      const data = Array.isArray(response.data) ? response.data : [];
+      setTrucks(data);
     } catch (error) {
       console.error("Failed to fetch trucks:", error);
-      alert("Failed to fetch trucks. Make sure you are logged in.");
+      alert("Failed to fetch trucks");
     } finally {
       setLoading(false);
     }
@@ -26,33 +28,36 @@ function ManageTrucks() {
 
   // Add a new truck
   const addTruck = async () => {
-    if (!truckName || !capacity) return;
+    if (!plate || !capacity) return;
 
     try {
       const payload = {
-        name: truckName,
-        capacity: parseInt(capacity, 10),
+        plate,
+        capacity_kg: parseInt(capacity, 10),
+        refrigerated,
       };
+
       const response = await api.post("/trucks/", payload);
-      setTrucks([...trucks, response.data]);
-      setTruckName("");
+      setTrucks((prev) => [...prev, response.data]);
+      setPlate("");
       setCapacity("");
+      setRefrigerated(true);
     } catch (error) {
       console.error("Failed to add truck:", error);
-      alert("Failed to add truck. Make sure you are logged in.");
+      alert("Failed to add truck");
     }
   };
 
-  // Optionally, delete a truck
+  // Delete a truck
   const deleteTruck = async (id) => {
     if (!window.confirm("Are you sure you want to delete this truck?")) return;
 
     try {
       await api.delete(`/trucks/${id}/`);
-      setTrucks(trucks.filter((t) => t.id !== id));
+      setTrucks((prev) => prev.filter((t) => t.id !== id));
     } catch (error) {
       console.error("Failed to delete truck:", error);
-      alert("Failed to delete truck.");
+      alert("Failed to delete truck");
     }
   };
 
@@ -63,16 +68,24 @@ function ManageTrucks() {
       <div className="truck-form">
         <input
           type="text"
-          placeholder="Truck Name"
-          value={truckName}
-          onChange={(e) => setTruckName(e.target.value)}
+          placeholder="Plate Number"
+          value={plate}
+          onChange={(e) => setPlate(e.target.value)}
         />
         <input
           type="number"
-          placeholder="Capacity (KGs)"
+          placeholder="Capacity (KG)"
           value={capacity}
           onChange={(e) => setCapacity(e.target.value)}
         />
+        <label>
+          <input
+            type="checkbox"
+            checked={refrigerated}
+            onChange={(e) => setRefrigerated(e.target.checked)}
+          />{" "}
+          Refrigerated
+        </label>
         <button onClick={addTruck}>Add Truck</button>
       </div>
 
@@ -85,7 +98,7 @@ function ManageTrucks() {
         <ul>
           {trucks.map((t) => (
             <li key={t.id}>
-              {t.name} - {t.capacity.toLocaleString()} KGs{" "}
+              {t.plate} - {t.capacity_kg} KGs - {t.refrigerated ? "Refrigerated" : "Non-refrigerated"} - {t.status}
               <button
                 style={{
                   marginLeft: "10px",
@@ -109,4 +122,3 @@ function ManageTrucks() {
 }
 
 export default ManageTrucks;
-

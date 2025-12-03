@@ -15,46 +15,35 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Get user ID from localStorage (or set dynamically)
+  const userId = localStorage.getItem("userId") || 1;
+
   const fetchStats = async () => {
     try {
       setLoading(true);
       setError("");
 
-      // Ensure token exists
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        navigate("/"); // redirect to login
-        return;
-      }
-
-      // Fetch all data concurrently using axios instance
       const [requestsRes, trucksRes, subscriptionRes] = await Promise.all([
-        api.get("/requests/"),
+        api.get(`/requests/?user_id=${userId}`),
         api.get("/trucks/"),
-        api.get("/subscriptions/"),
+        api.get(`/subscriptions/?user_id=${userId}`),
       ]);
 
       const requests = requestsRes.data;
       const pendingRequests = requests.filter((r) => r.status === "pending").length;
 
       const subscriptionPlan =
-        subscriptionRes.data.subscriptions?.[0]?.plan || "None";
+        subscriptionRes.data?.map((s) => s.plan)?.[0] || "None";
 
       setStats({
         totalRequests: requests.length,
         pendingRequests,
-        trucks: trucksRes.data.length,
+        trucks: trucksRes.data.trucks?.length || trucksRes.data.length,
         subscription: subscriptionPlan,
       });
     } catch (err) {
       console.error("Failed to fetch dashboard stats:", err);
-      setError("Failed to load dashboard stats. Please log in again.");
-
-      // If unauthorized, remove token and redirect
-      if (err.response?.status === 401) {
-        localStorage.removeItem("access_token");
-        navigate("/");
-      }
+      setError("Failed to load dashboard stats.");
     } finally {
       setLoading(false);
     }
@@ -105,18 +94,6 @@ function Dashboard() {
                 <h3>Manage Trucks</h3>
                 <p>Total Trucks: {stats.trucks}</p>
               </Link>
-            </div>
-
-            <div className="logout-section">
-              <button
-                className="logout-link"
-                onClick={() => {
-                  localStorage.removeItem("access_token");
-                  navigate("/");
-                }}
-              >
-                Logout
-              </button>
             </div>
           </>
         )}

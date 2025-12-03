@@ -1,8 +1,7 @@
-
-// Package.jsx
 import React, { useState } from "react";
 import "../index.css";
 import { api } from "../api";
+import "../pages/Package.css";
 
 function Package() {
   const [form, setForm] = useState({
@@ -20,25 +19,25 @@ function Package() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setLoading(true);
 
     try {
       const payload = {
         item_type: form.itemType,
-        weight_kg: form.weight,
+        weight_kg: parseFloat(form.weight), // Convert weight to number
         packaging_type: form.packagingType,
         notes: form.notes,
       };
 
-      await api.post("/packaging/", payload);
+      const response = await api.post("/packaging/", payload);
 
       alert("Packaging request submitted successfully!");
-      // Optionally, clear form
       setForm({ itemType: "", weight: "", packagingType: "", notes: "" });
     } catch (error) {
-      console.error("Failed to submit packaging request:", error);
-      alert("Failed to submit packaging request. Make sure you are logged in.");
+      console.error("Failed to submit packaging request:", error.response || error);
+      alert(
+        "Failed to submit packaging request. Check console for details and make sure you are logged in."
+      );
     } finally {
       setLoading(false);
     }
@@ -67,6 +66,7 @@ function Package() {
           value={form.weight}
           onChange={handleChange}
           placeholder="e.g. 20"
+          step="0.01"
           required
         />
 
@@ -100,4 +100,3 @@ function Package() {
 }
 
 export default Package;
-

@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager
 from models import db
 from config import Config
 
@@ -20,13 +19,13 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     Migrate(app, db)
-    JWTManager(app)
+    # JWTManager(app)  <-- removed
 
     # Configure CORS to allow your React frontend
     CORS(
         app,
-        origins=["http://localhost:5175"],  # React dev server
-        supports_credentials=True,          # allow cookies/JWT in requests
+        origins=["http://localhost:5173"],  # React dev server
+        supports_credentials=True,          # allow cookies in requests
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization"]
     )

@@ -1,13 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../index.css";
+import "../pages/CreateRequest.css";
 import { api } from "../api";
-
-const trucks = [
-  { size: "Small", capacity: 4000, basePrice: 3000 },
-  { size: "Medium", capacity: 8000, basePrice: 5000 },
-  { size: "Large", capacity: 15000, basePrice: 8000 },
-];
 
 const couriers = [
   { name: "QuickMove", available: true },
@@ -17,59 +10,61 @@ const couriers = [
   { name: "Farm2Market Couriers", available: true },
 ];
 
-const regions = [
-  { name: "Mombasa", multiplier: 1.5 },
-  { name: "Kisumu", multiplier: 1.3 },
-  { name: "Eldoret", multiplier: 1.2 },
-  { name: "Nakuru", multiplier: 1.1 },
-  { name: "Thika", multiplier: 1.05 },
-];
-
 function CreateRequest() {
   const [selectedCourier, setSelectedCourier] = useState(null);
-  const [selectedRegion, setSelectedRegion] = useState(null);
-  const [selectedTruck, setSelectedTruck] = useState(null);
+  const [pickup, setPickup] = useState("");
+  const [dropoff, setDropoff] = useState("");
+  const [goodsType, setGoodsType] = useState("");
+  const [weight, setWeight] = useState("");
   const [estimatedPrice, setEstimatedPrice] = useState(null);
+  const [submittedOrder, setSubmittedOrder] = useState(null); // new
 
-  const navigate = useNavigate();
-
-  const handleSelectCourier = (courier) => {
+  const handleCourierSelect = (courier) => {
     setSelectedCourier(courier);
-    setSelectedRegion(null);
-    setSelectedTruck(null);
-    setEstimatedPrice(null);
+    setSubmittedOrder(null); // reset any previous order
   };
 
-  const handleSelectRegion = (region) => {
-    setSelectedRegion(region);
-    setSelectedTruck(null);
-    setEstimatedPrice(null);
-  };
-
-  const handleSelectTruck = (truck) => {
-    setSelectedTruck(truck);
-    const price = truck.basePrice * selectedRegion.multiplier;
+  const handlePriceEstimate = () => {
+    const pricePerKg = 50;
+    const price = weight ? weight * pricePerKg : 0;
     setEstimatedPrice(price);
   };
 
   const handleSubmitOrder = async () => {
-    if (!selectedCourier || !selectedRegion || !selectedTruck) return;
+    if (!pickup || !dropoff || !goodsType || !weight) {
+      alert("Please fill all fields");
+      return;
+    }
 
     const payload = {
-      courier: selectedCourier.name,
-      region: selectedRegion.name,
-      truck: selectedTruck.size,
-      capacity: selectedTruck.capacity,
-      weight_kg: selectedTruck.capacity,
-      pickup_location: selectedRegion.name + " Depot",
-      dropoff_location: "Nairobi Town",
+      customer_id: 1, 
+      goods: goodsType,
+      weight_kg: parseFloat(weight),
+      pickup_location: pickup,
+      dropoff_location: dropoff,
       status: "pending",
     };
 
     try {
-      await api.post("/requests/", payload);
-      alert("Order submitted successfully!");
-      navigate("/view-requests");
+      const response = await api.post("/requests/", payload);
+
+      // Show submitted order details instead of redirecting
+      setSubmittedOrder({
+        courier: selectedCourier.name,
+        pickup: payload.pickup_location,
+        dropoff: payload.dropoff_location,
+        goods: payload.goods,
+        weight: payload.weight_kg,
+        price: payload.weight_kg * 50,
+        status: payload.status,
+      });
+
+      // Clear form inputs
+      setPickup("");
+      setDropoff("");
+      setGoodsType("");
+      setWeight("");
+      setEstimatedPrice(null);
     } catch (error) {
       console.error(error);
       alert("Failed to submit order.");
@@ -77,101 +72,90 @@ function CreateRequest() {
   };
 
   return (
-    <div className="dashboard-container">
-      {/* Go Back Button */}
-      <button 
-        className="go-back-button" 
-        onClick={() => navigate(-1)}
-        style={{ marginBottom: "1rem" }}
-      >
-        &larr; Go Back
-      </button>
+    <div className={`create-request-container ${!selectedCourier ? "courier-page" : "order-page"}`}>
+      <h2>Create a Delivery Request</h2>
 
-      <h2>Order a Truck to Nairobi Town</h2>
-
-      {!selectedCourier && (
+      {!selectedCourier ? (
         <>
-          <p>Select a courier:</p>
+          <p>Select a courier service:</p>
           <div className="services-grid">
             {couriers
               .filter((c) => c.available)
-              .map((courier, idx) => (
+              .map((c, idx) => (
                 <div
                   key={idx}
                   className="service-card"
-                  onClick={() => handleSelectCourier(courier)}
+                  onClick={() => handleCourierSelect(c)}
                 >
-                  {courier.name}
+                  {c.name}
                 </div>
               ))}
           </div>
         </>
-      )}
+      ) : (
+        <div className="request-form">
+          <label>Pickup Location</label>
+          <input
+            type="text"
+            value={pickup}
+            onChange={(e) => setPickup(e.target.value)}
+          />
 
-      {selectedCourier && !selectedRegion && (
-        <>
-          <p>Courier: {selectedCourier.name}</p>
-          <p>Select pickup region:</p>
+          <label>Dropoff Location</label>
+          <input
+            type="text"
+            value={dropoff}
+            onChange={(e) => setDropoff(e.target.value)}
+          />
 
-          <div className="services-grid">
-            {regions.map((region, idx) => (
-              <div
-                key={idx}
-                className="service-card"
-                onClick={() => handleSelectRegion(region)}
-              >
-                {region.name}
-              </div>
-            ))}
-          </div>
+          <label>Goods Type</label>
+          <input
+            type="text"
+            value={goodsType}
+            onChange={(e) => setGoodsType(e.target.value)}
+          />
 
-          <button onClick={() => setSelectedCourier(null)}>Back</button>
-        </>
-      )}
+          <label>Weight (kg)</label>
+          <input
+            type="number"
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
+          />
 
-      {selectedCourier && selectedRegion && (
-        <>
-          <p>
-            Courier: {selectedCourier.name} | Pickup: {selectedRegion.name} →
-            Nairobi Town
-          </p>
-          <p>Select Truck Size:</p>
+          <button type="button" onClick={handlePriceEstimate}>
+            Estimate Price
+          </button>
 
-          <div className="services-grid">
-            {trucks.map((truck, idx) => (
-              <div
-                key={idx}
-                className="service-card"
-                onClick={() => handleSelectTruck(truck)}
-              >
-                <h3>{truck.size}</h3>
-                <p>Capacity: {truck.capacity.toLocaleString()} KGs</p>
-                <p>Base Price: KES {truck.basePrice.toLocaleString()}</p>
-              </div>
-            ))}
-          </div>
+          {estimatedPrice !== null && (
+            <p>Estimated Price: KES {estimatedPrice.toLocaleString()}</p>
+          )}
 
-          {estimatedPrice && (
-            <div className="price-box">
-              Estimated Price: KES {estimatedPrice.toLocaleString()}
+          <button type="button" onClick={handleSubmitOrder}>
+            Submit Order
+          </button>
+
+          <button type="button" onClick={() => setSelectedCourier(null)}>
+            Back
+          </button>
+
+          {submittedOrder && (
+            <div className="submitted-order">
+              <h3>Order Submitted!</h3>
+              <p><strong>Courier:</strong> {submittedOrder.courier}</p>
+              <p><strong>Pickup:</strong> {submittedOrder.pickup}</p>
+              <p><strong>Dropoff:</strong> {submittedOrder.dropoff}</p>
+              <p><strong>Goods:</strong> {submittedOrder.goods}</p>
+              <p><strong>Weight:</strong> {submittedOrder.weight} KGs</p>
+              <p><strong>Estimated Price:</strong> KES {submittedOrder.price.toLocaleString()}</p>
+              <p><strong>Status:</strong> {submittedOrder.status}</p>
             </div>
           )}
-
-          {selectedTruck && (
-            <button
-              style={{ marginTop: "1rem" }}
-              className="service-button"
-              onClick={handleSubmitOrder}
-            >
-              Confirm Order
-            </button>
-          )}
-
-          <button onClick={() => setSelectedRegion(null)}>Back</button>
-        </>
+        </div>
       )}
     </div>
   );
 }
 
 export default CreateRequest;
+
+

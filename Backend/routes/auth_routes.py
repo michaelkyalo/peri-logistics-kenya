@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, create_refresh_token
 from models.user import User, Role
 from models import db
 
@@ -40,7 +39,7 @@ def register():
 
 
 # -----------------------------
-# LOGIN existing user
+# LOGIN existing user (NO TOKENS)
 # -----------------------------
 @auth_bp.post("/login")
 def login():
@@ -54,13 +53,9 @@ def login():
     if not user or not user.check_password(data["password"]):
         return jsonify({"error": "Invalid email or password"}), 401
 
-    # Use only user.id as JWT identity
-    access_token = create_access_token(identity=user.id)
-    refresh_token = create_refresh_token(identity=user.id)
-
+    # No JWT. Return user data only.
     return jsonify({
-        "access_token": access_token,
-        "refresh_token": refresh_token,
+        "message": "Login successful",
         "user": {
             "id": user.id,
             "full_name": user.full_name,

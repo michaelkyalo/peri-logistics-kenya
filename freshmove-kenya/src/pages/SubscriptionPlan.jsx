@@ -5,6 +5,7 @@ import { api } from "../api";
 function SubscriptionPlan() {
   const navigate = useNavigate();
 
+  // Example subscription plans
   const plans = [
     {
       name: "Basic Plan",
@@ -49,10 +50,19 @@ function SubscriptionPlan() {
 
   const handleSubscribe = async (planName, price) => {
     try {
+      // Get user info from localStorage
+      const userId = localStorage.getItem("userId"); // store this on login
+      if (!userId) {
+        alert("Please login first to subscribe!");
+        return;
+      }
+
       const payload = {
+        user_id: parseInt(userId), // backend expects integer
         plan: planName,
         price: price,
       };
+
       await api.post("/subscriptions/", payload);
       alert(`You have successfully subscribed to the ${planName}!`);
       navigate("/dashboard"); // Redirect after subscription
@@ -108,3 +118,4 @@ function SubscriptionPlan() {
 }
 
 export default SubscriptionPlan;
+

@@ -1,22 +1,33 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.request import Request
 from models import db
 
 request_bp = Blueprint("request_bp", __name__)
 
+# Fixed rate per kg (adjust as needed)
+PRICE_PER_KG = 50  # Example: 50 currency units per kg
+
 # -----------------------------
-# GET all requests for logged-in user
+# GET all requests for a user (user_id passed as query param)
 # -----------------------------
 @request_bp.get("/")
-@jwt_required()
 def all_requests():
     try:
-        identity = get_jwt_identity()
-        user_id = identity if isinstance(identity, int) else identity.get("id")
+        user_id = request.args.get("user_id", type=int)
+
+        if user_id is None:
+            return jsonify({"error": "user_id query parameter is required"}), 400
 
         requests = Request.query.filter_by(customer_id=user_id).all()
-        return jsonify([req.to_dict() for req in requests]), 200
+
+        requests_list = []
+        for req in requests:
+            req_dict = req.to_dict()
+            # Add estimated price
+            req_dict["estimated_price"] = req.weight_kg * PRICE_PER_KG
+            requests_list.append(req_dict)
+
+        return jsonify(requests_list), 200
     except Exception as e:
         print("Error fetching requests:", e)
         return jsonify({"error": "Failed to fetch requests"}), 500
@@ -25,12 +36,13 @@ def all_requests():
 # CREATE a new request
 # -----------------------------
 @request_bp.post("/")
-@jwt_required()
 def create_request():
     try:
         data = request.json
-        identity = get_jwt_identity()
-        user_id = identity if isinstance(identity, int) else identity.get("id")
+        user_id = data.get("customer_id")
+
+        if not user_id:
+            return jsonify({"error": "customer_id is required"}), 400
 
         required_fields = ["goods", "weight_kg", "pickup_location", "dropoff_location"]
         if not data or not all(field in data for field in required_fields):
@@ -50,16 +62,19 @@ def create_request():
         db.session.add(new_request)
         db.session.commit()
 
-        return jsonify(new_request.to_dict()), 201
+        # Add estimated price in response
+        response_data = new_request.to_dict()
+        response_data["estimated_price"] = new_request.weight_kg * PRICE_PER_KG
+
+        return jsonify(response_data), 201
     except Exception as e:
         print("Error creating request:", e)
         return jsonify({"error": "Failed to create request"}), 500
 
 # -----------------------------
-# UPDATE a request status (e.g., by driver/admin)
+# UPDATE a request
 # -----------------------------
 @request_bp.put("/<int:req_id>")
-@jwt_required()
 def update_request(req_id):
     try:
         data = request.json
@@ -76,7 +91,12 @@ def update_request(req_id):
             req.truck_id = data["truck_id"]
 
         db.session.commit()
-        return jsonify(req.to_dict()), 200
+
+        # Include estimated price in response
+        req_dict = req.to_dict()
+        req_dict["estimated_price"] = req.weight_kg * PRICE_PER_KG
+
+        return jsonify(req_dict), 200
     except Exception as e:
         print("Error updating request:", e)
         return jsonify({"error": "Failed to update request"}), 500
@@ -85,7 +105,6 @@ def update_request(req_id):
 # DELETE a request
 # -----------------------------
 @request_bp.delete("/<int:req_id>")
-@jwt_required()
 def delete_request(req_id):
     try:
         req = Request.query.get(req_id)

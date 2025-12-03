@@ -4,5 +4,7 @@ class Packaging(db.Model):
     __tablename__ = "packaging"
 
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(120))
-    price = db.Column(db.Float)
+    item_type = db.Column(db.String(120), nullable=False)
+    weight_kg = db.Column(db.Float, nullable=False)
+    packaging_type = db.Column(db.String(120), nullable=False)
+    notes = db.Column(db.Text, default="")

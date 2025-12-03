@@ -1,19 +1,19 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.subscription import Subscription
 from models import db
 
 subscription_bp = Blueprint("subscription_bp", __name__)
 
 # -----------------------------
-# GET all subscriptions for logged-in user
+# GET all subscriptions for a user (user_id passed as query param)
 # -----------------------------
 @subscription_bp.get("/")
-@jwt_required()
 def get_subscriptions():
     try:
-        identity = get_jwt_identity()
-        user_id = identity if isinstance(identity, int) else identity.get("id")
+        user_id = request.args.get("user_id", type=int)
+
+        if user_id is None:
+            return jsonify({"error": "user_id query parameter is required"}), 400
 
         subscriptions = Subscription.query.filter_by(user_id=user_id).all()
         return jsonify([sub.to_dict() for sub in subscriptions]), 200
@@ -25,18 +25,15 @@ def get_subscriptions():
 # CREATE a new subscription
 # -----------------------------
 @subscription_bp.post("/")
-@jwt_required()
 def create_subscription():
     try:
         data = request.json
-        identity = get_jwt_identity()
-        user_id = identity if isinstance(identity, int) else identity.get("id")
 
-        if not data or "plan" not in data or "price" not in data:
-            return jsonify({"error": "Plan and price are required"}), 400
+        if not data or "user_id" not in data or "plan" not in data or "price" not in data:
+            return jsonify({"error": "user_id, plan, and price are required"}), 400
 
         new_sub = Subscription(
-            user_id=user_id,
+            user_id=data["user_id"],
             plan=data["plan"],
             price=float(data["price"])
         )
@@ -53,11 +50,12 @@ def create_subscription():
 # DELETE a subscription by id
 # -----------------------------
 @subscription_bp.delete("/<int:sub_id>")
-@jwt_required()
 def delete_subscription(sub_id):
     try:
-        identity = get_jwt_identity()
-        user_id = identity if isinstance(identity, int) else identity.get("id")
+        user_id = request.args.get("user_id", type=int)
+
+        if not user_id:
+            return jsonify({"error": "user_id query parameter is required"}), 400
 
         sub = Subscription.query.filter_by(id=sub_id, user_id=user_id).first()
         if not sub:

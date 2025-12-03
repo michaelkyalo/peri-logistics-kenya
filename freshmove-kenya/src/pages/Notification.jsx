@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
@@ -11,7 +10,13 @@ function Notification() {
   const fetchNotifications = async () => {
     try {
       const response = await api.get("/notifications/");
-      setNotifications(response.data);
+      
+      // Ensure notifications is always an array
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data.notifications || [];
+      
+      setNotifications(data);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
       alert("Failed to load notifications. Make sure you are logged in.");
@@ -47,12 +52,12 @@ function Notification() {
 
       {loading ? (
         <p>Loading notifications...</p>
-      ) : notifications.length === 0 ? (
+      ) : !Array.isArray(notifications) || notifications.length === 0 ? (
         <p className="no-notifications">No new notifications</p>
       ) : (
         <ul className="notification-list">
           {notifications.map((note, index) => (
-            <li key={index} className={`notification-item ${note.type}`}>
+            <li key={index} className={`notification-item ${note.type || ""}`}>
               <p className="message">{note.message}</p>
               <span className="time">{note.time}</span>
             </li>

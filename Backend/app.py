@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -13,19 +14,26 @@ from routes.subscription_routes import subscription_bp
 from routes.packaging_routes import packaging_bp
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, instance_relative_config=True)
+
+    # Ensure instance folder exists
+    os.makedirs(app.instance_path, exist_ok=True)
+
+    # Set database path to instance/peri_logistics.db
     app.config.from_object(Config)
+    app.config['SQLALCHEMY_DATABASE_URI'] = \
+        f"sqlite:///{os.path.join(app.instance_path, 'peri_logistics.db')}"
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize extensions
     db.init_app(app)
     Migrate(app, db)
-    # JWTManager(app)  <-- removed
 
-    # Configure CORS to allow your React frontend
+    # Configure CORS for your React frontend
     CORS(
         app,
-        origins=["http://localhost:5173"],  # React dev server
-        supports_credentials=True,          # allow cookies in requests
+        origins=["http://localhost:5173"],
+        supports_credentials=True,
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization"]
     )
